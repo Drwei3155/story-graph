@@ -726,12 +726,63 @@ function searchRelations(query) {
           html += `<div class="path-relation">  ↳ ${e ? e.type : '关联'}  ↴</div>`;
         }
       }
-      pathContent.innerHTML = html;
+      pathContent.innerHTML = html + '<div style="font-size:12px;color:var(--text-dim);margin-top:8px" id="explain-loading">🤔 分析关系…</div>';
       pathContent.querySelectorAll('[data-char]').forEach(el => el.addEventListener('click', () => showCharacter(el.dataset.char)));
       pathCard.classList.add('show');
       const validPath = path.filter(id => !outOfDataChars.has(id));
       network.selectNodes(validPath);
       network.fit({ nodes: validPath, animation: { duration: 800, easingFunction: 'easeInOutQuad' } });
+
+      // ── 异步获取 AI 关系解释 ──
+      (async () => {
+        const rels = [];
+        for (let i = 0; i < path.length - 1; i++) {
+          const ek = edgeKey(path[i], path[i+1]);
+          const e = edgeByPair[ek];
+          if (e && charMap[path[i]] && charMap[path[i+1]]) {
+            rels.push({ aName: charMap[path[i]].name, bName: charMap[path[i+1]].name, type: e.type });
+          }
+        }
+        if (rels.length === 0) return;
+
+        const nov = (currentData && currentData.novelName) || '未知';
+        let expText = '';
+
+        try {
+          const resp = await fetch('/api/explain-path', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ charA: a, charB: b, relations: rels, novelName: nov }),
+          });
+          if (resp.ok) { const d = await resp.json(); expText = d.explanation || ''; }
+        } catch (_) {}
+
+        if (!expText) {
+          const dk = apiKeyInput.value.trim();
+          if (dk) {
+            try {
+              const relSummary = rels.map(r => `${r.aName} -[${r.type}]-> ${r.bName}`).join('; ');
+              const resp = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${dk}` },
+                body: JSON.stringify({
+                  model: 'deepseek-chat', max_tokens: 256, temperature: 0.3,
+                  messages: [
+                    { role: 'system', content: '用1-2句中文回答人物关系，简洁直接。' },
+                    { role: 'user', content: `小说《${nov}》中，${a.name}和${b.name}的关系链：${relSummary}。一句话概括他们的关系。` },
+                  ],
+                }),
+              });
+              if (resp.ok) { const j = await resp.json(); expText = j.choices?.[0]?.message?.content || ''; }
+            } catch (_) {}
+          }
+        }
+
+        const el = document.getElementById('explain-loading');
+        if (el) {
+          el.innerHTML = expText ? `💡 <span style="color:var(--accent)">${expText}</span>` : `<span style="color:var(--text-dim)">(关系路径如上所示)</span>`;
+        }
+      })();
       return;
     }
 

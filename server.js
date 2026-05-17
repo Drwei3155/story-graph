@@ -225,6 +225,38 @@ app.post('/api/search', async (req, res) => {
   }
 });
 
+// ── 关系路径解释 API ──
+app.post('/api/explain-path', async (req, res) => {
+  if (!apiReady) return res.status(503).json({ error: '未配置 API Key' });
+
+  const { charA, charB, relations, novelName } = req.body;
+  if (!charA || !charB) return res.status(400).json({ error: '缺少参数' });
+
+  const relSummary = (relations || []).map(r => `${r.aName} -[${r.type}]-> ${r.bName}`).join('; ');
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: 256,
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: '用1-2句中文回答两个人物的关系，简洁直接。' },
+          { role: 'user', content: `小说《${novelName || '未知'}》中，${charA.name}和${charB.name}的关系链：${relSummary}。请一句话概括他们的关系。` },
+        ],
+      }),
+    });
+    if (!resp.ok) return res.status(500).json({ error: 'API异常' });
+    const json = await resp.json();
+    const explanation = json.choices?.[0]?.message?.content || '';
+    res.json({ explanation });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── 启动服务器 ──
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
