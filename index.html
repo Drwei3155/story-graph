@@ -15,6 +15,7 @@
   --shu:#e74c3c;--wei:#3498db;--wu:#2ecc71;--han:#9b59b6;--jin:#e67e22;--other:#666;
   --danger:#ff4757;--shadow:0 4px 24px rgba(0,0,0,.5);
 }
+html.light{--bg:#f0f2f5;--surface:#ffffff;--border:#d0d4dd;--text:#1a1a2e;--text-dim:#999;--accent:#c8a832;--danger:#e04040;--shadow:0 4px 24px rgba(0,0,0,.12)}
 body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;width:100vw}
 
 /* Header */
@@ -30,12 +31,16 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
 #voice-btn.listening{color:var(--danger);animation:pulse 1.2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 #legend{display:flex;gap:14px;font-size:12px;margin-left:auto}
-.legend-item{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.legend-item{display:flex;align-items:center;gap:5px;white-space:nowrap;transition:opacity .2s}
+.legend-item.active-filter{opacity:1!important}
+.legend-item.active-filter .legend-dot{box-shadow:0 0 8px currentColor}
 .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 #generate-btn{padding:6px 16px;border-radius:18px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;cursor:pointer;transition:all .2s;margin-left:8px;white-space:nowrap}
 #generate-btn:hover{background:rgba(240,192,64,.12)}
 #export-btn{background:none;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-size:16px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 #export-btn:hover{color:var(--accent);border-color:var(--accent)}
+#share-btn{background:none;border:1px solid transparent;color:var(--text-dim);cursor:pointer;font-size:16px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#share-btn:hover{color:var(--accent);border-color:var(--accent)}
 
 /* Graph */
 #graph-container{position:absolute;top:0;left:0;right:0;bottom:80px;z-index:1}
@@ -154,6 +159,19 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
 #api-key-input:focus{border-color:var(--accent)}
 .api-key-saved{font-size:11px;color:var(--text-dim);margin-top:4px}
 
+/* Novel tabs */
+#novel-tabs{position:absolute;top:56px;left:0;right:0;z-index:80;display:flex;gap:2px;padding:0 16px;height:28px;overflow-x:auto;pointer-events:none}
+#novel-tabs>*{pointer-events:auto}
+#novel-tabs::-webkit-scrollbar{height:0}
+.novel-tab{display:flex;align-items:center;gap:4px;padding:3px 12px;border-radius:8px 8px 0 0;font-size:12px;background:var(--surface);border:1px solid var(--border);border-bottom:none;color:var(--text-dim);cursor:pointer;white-space:nowrap;transition:all .15s;opacity:.6;flex-shrink:0}
+.novel-tab:hover{opacity:.9;color:var(--text)}
+.novel-tab.active{opacity:1;color:var(--accent);background:var(--bg);border-color:var(--accent);position:relative}
+.novel-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--bg)}
+.novel-tab .tab-close{font-size:10px;margin-left:2px;padding:1px 3px;border-radius:3px;background:none;border:none;color:var(--text-dim);cursor:pointer}
+.novel-tab .tab-close:hover{color:var(--danger);background:rgba(255,71,87,.15)}
+#novel-tab-add{display:flex;align-items:center;justify-content:center;padding:3px 10px;border-radius:8px 8px 0 0;font-size:14px;background:transparent;border:1px dashed var(--border);border-bottom:none;color:var(--text-dim);cursor:pointer;transition:all .2s;flex-shrink:0}
+#novel-tab-add:hover{color:var(--accent);border-color:var(--accent)}
+
 /* History panel */
 #history-toggle{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s;flex-shrink:0}
 #history-toggle:hover{color:var(--accent);background:rgba(255,255,255,.05)}
@@ -174,14 +192,51 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
 #history-clear{width:100%;padding:6px;margin-top:8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;cursor:pointer;transition:all .2s}
 #history-clear:hover{color:var(--danger);border-color:var(--danger)}
 
+/* Stats panel */
+#stats-toggle{background:none;border:1px solid transparent;color:var(--text-dim);cursor:pointer;font-size:16px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#stats-toggle:hover{color:var(--accent);border-color:var(--accent)}
+#stats-panel{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:380px;max-height:70vh;background:var(--surface);border:1px solid var(--border);border-radius:16px;z-index:110;padding:20px 24px;overflow-y:auto;display:none;box-shadow:var(--shadow);animation:slideUp .25s ease-out}
+#stats-panel.show{display:block}
+#stats-panel::-webkit-scrollbar{width:4px}
+#stats-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+#stats-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+#stats-header span{font-size:16px;font-weight:600;color:var(--accent)}
+#stats-close{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;padding:2px}
+#stats-close:hover{color:var(--text)}
+#stats-content{font-size:13px}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);color:var(--text)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text-dim)}
+.stat-value{font-weight:600}
+.stat-section-title{font-size:14px;font-weight:600;color:var(--text);margin:14px 0 8px}
+.bar-chart{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.bar-item{display:flex;align-items:center;gap:8px}
+.bar-label{width:60px;font-size:12px;color:var(--text-dim);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:16px;background:var(--bg);border-radius:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:8px;transition:width .6s ease;min-width:4px}
+.bar-count{font-size:11px;color:var(--text-dim);width:24px;text-align:right}
+.stat-top-item{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;color:var(--text)}
+.stat-top-item .rank{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#0f1119;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.stat-top-item .rank.r2{background:#a0a0b0}
+.stat-top-item .rank.r3{background:#cd7f32}
+
 /* Edit mode */
 #edit-toggle{background:none;border:1px solid transparent;color:var(--text-dim);cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 #edit-toggle:hover{color:var(--text);border-color:var(--border)}
 #edit-toggle.active{color:var(--accent);border-color:var(--accent);background:rgba(240,192,64,.1)}
+#theme-toggle{background:none;border:1px solid transparent;color:var(--text-dim);cursor:pointer;font-size:15px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#theme-toggle:hover{color:var(--text);border-color:var(--border)}
 #graph-container.edit-mode{border:1px dashed var(--accent);border-radius:4px}
-#save-layout-btn{position:absolute;left:20px;bottom:100px;z-index:90;padding:8px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);font-size:13px;cursor:pointer;display:none;transition:all .2s;box-shadow:var(--shadow)}
-#save-layout-btn:hover{background:rgba(240,192,64,.12)}
-#save-layout-btn.show{display:block}
+#edit-toolbar{position:absolute;left:20px;bottom:100px;z-index:90;display:flex;flex-direction:column;gap:8px;display:none}
+#edit-toolbar.show{display:flex}
+#edit-toolbar button{padding:8px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);font-size:13px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);white-space:nowrap}
+#edit-toolbar button:hover{background:rgba(240,192,64,.12)}
+#save-layout-btn{} /* inherited from toolbar now */
+#add-rel-btn.active{background:rgba(240,192,64,.2);border-color:var(--accent)}
+#add-rel-indicator{position:absolute;left:50%;top:70px;transform:translateX(-50%);z-index:95;padding:8px 20px;border-radius:20px;background:var(--surface);border:1px solid var(--accent);color:var(--text);font-size:14px;box-shadow:var(--shadow);transition:opacity .3s;pointer-events:none}
+#add-rel-indicator.hidden{opacity:0;pointer-events:none}
+#add-rel-indicator b{color:var(--accent)}
+
 
 /* TTS button */
 .tts-btn{background:none;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;vertical-align:middle;margin-left:6px}
@@ -198,11 +253,16 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
     <button id="voice-btn" title="语音搜索">🎤</button>
   </div>
   <button id="history-toggle" title="搜索历史">📋</button>
+  <button id="theme-toggle" title="切换主题">🌓</button>
+  <button id="stats-toggle" title="数据统计">📊</button>
   <button id="edit-toggle" title="编辑模式：拖拽调整节点位置">✏️</button>
   <div id="legend"></div>
+  <button id="share-btn" title="分享图谱">📤</button>
   <button id="export-btn" title="导出图谱为图片">📷</button>
   <button id="generate-btn" title="输入任意小说名，AI 自动生成人物关系图谱">✨ 更换小说</button>
 </header>
+
+<div id="novel-tabs"></div>
 
 <div id="history-panel">
   <div id="history-header">
@@ -214,7 +274,11 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
 </div>
 
 <div id="graph-container"></div>
-<button id="save-layout-btn" title="保存当前节点布局">💾 保存布局</button>
+<div id="edit-toolbar">
+  <button id="add-rel-btn" title="添加关系连线">➕ 添加关系</button>
+  <button id="save-layout-btn" title="保存当前节点布局">💾 保存布局</button>
+</div>
+<div id="add-rel-indicator" class="hidden">请点击<b>起点</b>角色</div>
 
 <div id="info-panel">
   <button id="info-close">✕</button>
@@ -227,6 +291,14 @@ body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;bac
 <div id="path-card">
   <h4>🔗 关系路径</h4>
   <div id="path-content"></div>
+</div>
+
+<div id="stats-panel">
+  <div id="stats-header">
+    <span>📊 数据统计</span>
+    <button id="stats-close">✕</button>
+  </div>
+  <div id="stats-content"></div>
 </div>
 
 <nav id="timeline"></nav>
@@ -402,10 +474,29 @@ const historyClose = document.getElementById('history-close');
 const historyList = document.getElementById('history-list');
 const historyClear = document.getElementById('history-clear');
 
+// Theme toggle
+const themeToggle = document.getElementById('theme-toggle');
+function setTheme(theme) {
+  document.documentElement.classList.toggle('light', theme === 'light');
+  localStorage.setItem('theme', theme);
+}
+themeToggle.addEventListener('click', function() {
+  const isLight = document.documentElement.classList.contains('light');
+  setTheme(isLight ? 'dark' : 'light');
+});
+// Restore theme on load
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') setTheme('light');
+
 // Edit mode DOM
 const editToggle = document.getElementById('edit-toggle');
+const editToolbar = document.getElementById('edit-toolbar');
+const addRelBtn = document.getElementById('add-rel-btn');
 const saveLayoutBtn = document.getElementById('save-layout-btn');
+const addRelIndicator = document.getElementById('add-rel-indicator');
 let editMode = false;
+let addEdgeMode = false;
+let addEdgeSource = null;
 
 // ===================== NETWORK =====================
 const nodes = new vis.DataSet();
@@ -436,6 +527,7 @@ let abortController = null;
 
 function loadNovelData(data) {
   currentData = data;
+  activeFactionFilter = null;
   charMap = {};
   adj = {};
   edgeByPair = {};
@@ -493,12 +585,45 @@ function loadNovelData(data) {
     arrows: { to: { enabled: r.style === 'dashed', scaleFactor: 0.5 } },
   })));
 
+  // Load custom edges (user-added)
+  const customEdges = loadCustomEdges();
+  customEdges.forEach(r => {
+    // Skip if already exists from API data
+    const exists = data.relations.some(er =>
+      (er.from === r.from && er.to === r.to) || (er.from === r.to && er.to === r.from)
+    );
+    if (exists) return;
+    data.relations.push(r);
+    if (!adj[r.from]) adj[r.from] = [];
+    if (!adj[r.to]) adj[r.to] = [];
+    adj[r.from].push(r.to);
+    adj[r.to].push(r.from);
+    edgeByPair[edgeKey(r.from, r.to)] = r;
+    edges.add({
+      from: r.from, to: r.to, label: r.type,
+      dashes: r.style === 'dashed' ? [8, 4] : (r.style === 'dotted' ? [3, 3] : false),
+      color: { color: r.style === 'dashed' ? '#555' : '#888', hover: '#f0c040' },
+      font: { color: '#666', size: 10, strokeWidth: 2, strokeColor: '#0f1119' },
+      width: r.style === 'solid' ? 1.5 : 1,
+      smooth: { type: 'continuous' },
+      arrows: { to: { enabled: r.style === 'dashed', scaleFactor: 0.5 } },
+    });
+  });
+
   // 更新 UI
   logo.textContent = (data.novelName || '未知小说') + ' · 人物谱';
   document.title = (data.novelName || '小说') + ' · 人物关系图谱';
   rebuildLegend();
   buildTimeline();
   closeAllPanels();
+
+  // Register in multi-novel map
+  const nName = data.novelName;
+  if (nName && !novelTabOrder.includes(nName)) {
+    novelDataMap[nName] = { data };
+    novelTabOrder.push(nName);
+  }
+  rebuildNovelTabs();
 
   network.once('stabilizationIterationsDone', function() {
     network.fit({ animation: { duration: 800, easingFunction: 'easeInOutQuad' } });
@@ -515,12 +640,53 @@ function closeAllPanels() {
   searchInput.value = '';
 }
 
-// ===================== LEGEND =====================
+// ===================== LEGEND & FILTER =====================
+let activeFactionFilter = null;
+
+function setFactionFilter(factionKey) {
+  if (activeFactionFilter === factionKey) {
+    // Toggle off
+    activeFactionFilter = null;
+  } else {
+    activeFactionFilter = factionKey;
+  }
+
+  if (!activeFactionFilter || !currentData) {
+    // Show all nodes
+    currentData && currentData.characters.forEach(c => { nodes.update({ id: c.id, hidden: false }); });
+    rebuildLegend();
+    return;
+  }
+
+  // Hide characters not in this faction
+  currentData.characters.forEach(c => {
+    nodes.update({ id: c.id, hidden: c.faction !== activeFactionFilter });
+  });
+  rebuildLegend();
+  // Focus on visible nodes
+  const visible = currentData.characters.filter(c => c.faction === activeFactionFilter).map(c => c.id);
+  if (visible.length > 0) network.fit({ nodes: visible, animation: { duration: 500 } });
+}
+
 function rebuildLegend() {
   const factions = (currentData && currentData.factions) || [];
-  legendEl.innerHTML = factions.map(f =>
-    `<span class="legend-item"><span class="legend-dot" style="background:${f.color}"></span>${f.name}</span>`
-  ).join('');
+  let html = factions.map(f => {
+    const active = activeFactionFilter === f.key;
+    return `<span class="legend-item ${active ? 'active-filter' : ''}" data-faction="${f.key}" style="cursor:pointer;${active ? 'opacity:1' : ''}">
+      <span class="legend-dot" style="background:${f.color}"></span>${f.name}
+    </span>`;
+  }).join('');
+  if (activeFactionFilter) {
+    html += `<span class="legend-item" id="filter-reset" style="cursor:pointer;color:var(--accent);font-size:11px;margin-left:4px">✕ 显示全部</span>`;
+  }
+  legendEl.innerHTML = html;
+
+  // Attach click handlers
+  legendEl.querySelectorAll('.legend-item[data-faction]').forEach(el => {
+    el.addEventListener('click', () => setFactionFilter(el.dataset.faction));
+  });
+  const resetBtn = document.getElementById('filter-reset');
+  if (resetBtn) resetBtn.addEventListener('click', () => setFactionFilter(null));
 }
 
 // ===================== INFO PANEL =====================
@@ -566,6 +732,90 @@ infoClose.addEventListener('click', () => {
 });
 
 network.on('click', function(params) {
+  // Add-edge mode: node selection
+  if (addEdgeMode) {
+    if (params.nodes.length === 1) {
+      const nodeId = params.nodes[0];
+      if (!addEdgeSource) {
+        addEdgeSource = nodeId;
+        addRelIndicator.innerHTML = '请点击<b>终点</b>角色';
+        network.selectNodes([nodeId]);
+        return;
+      } else if (nodeId !== addEdgeSource) {
+        // Both source and target selected — create edge
+        const relType = prompt('请输入关系类型（如：义父女、结拜、君臣…）', '义父女');
+        if (relType && relType.trim()) {
+          const styleMap = { '父':'solid','母':'solid','兄':'solid','姐':'solid','子':'solid','女':'solid','师':'dotted','徒':'dotted','敌':'dashed','仇':'dashed' };
+          let style = 'solid';
+          for (const [kw, s] of Object.entries(styleMap)) {
+            if (relType.includes(kw)) { style = s; break; }
+          }
+          // Check if edge already exists
+          const existing = edges.get().find(e =>
+            (e.from === addEdgeSource && e.to === nodeId) || (e.from === nodeId && e.to === addEdgeSource)
+          );
+          if (existing) {
+            showError('这两个角色之间已有关系');
+          } else {
+            addEdgeToGraph(addEdgeSource, nodeId, relType.trim(), style);
+            saveCustomEdge(addEdgeSource, nodeId, relType.trim(), style);
+          }
+        }
+        // Reset for next
+        addEdgeSource = null;
+        addRelIndicator.innerHTML = '请点击<b>起点</b>角色';
+        network.selectNodes([]);
+        return;
+      }
+    }
+    return; // In add-edge mode, ignore other clicks
+  }
+
+  // Edit mode: edge editing
+  if (editMode) {
+    if (params.edges && params.edges.length === 1) {
+      const edgeId = params.edges[0];
+      const edge = edges.get(edgeId);
+      if (edge) {
+        const action = prompt(
+          `关系：${edge.label || '无标签'}\n\n输入新关系名 → 修改 | 输入"删除" → 删除此关系 | 取消 → 不变`,
+          edge.label || ''
+        );
+        if (action === null) return; // cancelled
+        if (action.trim() === '删除') {
+          edges.remove(edgeId);
+          // Remove from currentData
+          if (currentData) {
+            const idx = currentData.relations.findIndex(r =>
+              (r.from === edge.from && r.to === edge.to) || (r.from === edge.to && r.to === edge.from)
+            );
+            if (idx !== -1) currentData.relations.splice(idx, 1);
+            // Remove from adjacency
+            const ek = edgeKey(edge.from, edge.to);
+            delete edgeByPair[ek];
+            if (adj[edge.from]) adj[edge.from] = adj[edge.from].filter(id => id !== edge.to);
+            if (adj[edge.to]) adj[edge.to] = adj[edge.to].filter(id => id !== edge.from);
+          }
+          deleteCustomEdge(edge.from, edge.to);
+          showError('关系已删除');
+        } else if (action.trim()) {
+          edges.update({ id: edgeId, label: action.trim() });
+          // Update in currentData
+          if (currentData) {
+            const idx = currentData.relations.findIndex(r =>
+              (r.from === edge.from && r.to === edge.to) || (r.from === edge.to && r.to === edge.from)
+            );
+            if (idx !== -1) currentData.relations[idx].type = action.trim();
+          }
+          // Save as custom override
+          saveCustomEdge(edge.from, edge.to, action.trim(), edge.dashes ? (edge.dashes[0] === 3 ? 'dotted' : 'dashed') : 'solid');
+        }
+      }
+      return;
+    }
+  }
+
+  // Normal mode: node click → show info
   if (params.nodes.length === 1) {
     showCharacter(params.nodes[0]);
   } else {
@@ -1507,9 +1757,85 @@ loadingCancel.addEventListener('click', function() {
   hideLoading();
 });
 
+// ===================== MULTI-NOVEL TABS =====================
+let novelDataMap = {};
+let novelTabOrder = [];
+const novelTabsEl = document.getElementById('novel-tabs');
+
+function saveCurrentNovelState() {
+  if (!currentData || !currentData.novelName) return;
+  const name = currentData.novelName;
+  try {
+    const positions = network.getPositions();
+    novelDataMap[name] = { data: JSON.parse(JSON.stringify(currentData)), positions };
+  } catch (_) { novelDataMap[name] = { data: currentData }; }
+  if (!novelTabOrder.includes(name)) novelTabOrder.push(name);
+}
+
+function rebuildNovelTabs() {
+  if (novelTabOrder.length < 2) { novelTabsEl.innerHTML = ''; return; }
+  const currentName = currentData ? currentData.novelName : '';
+  let html = novelTabOrder.map(name =>
+    `<div class="novel-tab ${name === currentName ? 'active' : ''}" data-tab="${name.replace(/"/g,'&quot;')}">
+      ${name.length > 8 ? name.slice(0, 8) + '…' : name}
+      <button class="tab-close" data-tab="${name.replace(/"/g,'&quot;')}" title="关闭">✕</button>
+    </div>`
+  ).join('');
+  html += '<div id="novel-tab-add" title="添加新小说">＋</div>';
+  novelTabsEl.innerHTML = html;
+
+  novelTabsEl.querySelectorAll('.novel-tab').forEach(el => {
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('.tab-close')) return;
+      const name = this.dataset.tab;
+      if (name !== currentName) switchToNovel(name);
+    });
+  });
+  novelTabsEl.querySelectorAll('.tab-close').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const name = this.dataset.tab;
+      closeNovelTab(name);
+    });
+  });
+  document.getElementById('novel-tab-add').addEventListener('click', function() {
+    openModal();
+  });
+}
+
+function switchToNovel(name) {
+  if (!novelDataMap[name]) return;
+  saveCurrentNovelState();
+  const entry = novelDataMap[name];
+  loadNovelData(entry.data);
+  if (entry.positions) {
+    setTimeout(() => {
+      try { network.moveNode(entry.positions); } catch (_) {}
+      network.fit({ animation: { duration: 300 } });
+    }, 200);
+  }
+  // Refresh tab highlight
+  rebuildNovelTabs();
+}
+
+function closeNovelTab(name) {
+  if (!novelDataMap[name]) return;
+  if (novelTabOrder.length <= 1) return; // Keep at least one
+  const idx = novelTabOrder.indexOf(name);
+  delete novelDataMap[name];
+  novelTabOrder.splice(idx, 1);
+  // If current tab was closed, switch to another
+  if (currentData && currentData.novelName === name) {
+    const next = novelTabOrder[Math.min(idx, novelTabOrder.length - 1)];
+    if (next && novelDataMap[next]) switchToNovel(next);
+  }
+  rebuildNovelTabs();
+}
+
 // ===================== KEYBOARD =====================
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
+    if (addEdgeMode) { exitAddEdgeMode(); return; }
     if (modalOverlay.classList.contains('show')) { closeModal(); return; }
     closeAllPanels();
     resetNodeOpacity();
@@ -1562,19 +1888,127 @@ async function exportGraph() {
 
 exportBtn.addEventListener('click', exportGraph);
 
+// Stats
+const statsToggle = document.getElementById('stats-toggle');
+const statsPanel = document.getElementById('stats-panel');
+const statsClose = document.getElementById('stats-close');
+const statsContent = document.getElementById('stats-content');
+
+function renderStats() {
+  if (!currentData) { statsContent.innerHTML = '<div style="color:var(--text-dim)">暂无数据</div>'; return; }
+  const d = currentData;
+  const chars = d.characters || [];
+  const rels = d.relations || [];
+  const factions = d.factions || [];
+  const events = d.events || [];
+  const n = chars.length;
+  const m = rels.length;
+  const density = n > 1 ? (m / (n * (n - 1) / 2) * 100).toFixed(1) : '0.0';
+
+  // Count relations per character
+  const relCount = {};
+  chars.forEach(c => { relCount[c.id] = 0; });
+  rels.forEach(r => {
+    if (relCount[r.from] !== undefined) relCount[r.from]++;
+    if (relCount[r.to] !== undefined) relCount[r.to]++;
+  });
+  const topChars = Object.entries(relCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([id, cnt]) => ({ char: charMap[id] || chars.find(c => c.id === id), count: cnt, id }))
+    .filter(item => item.char);
+
+  // Faction breakdown
+  const factionCounts = {};
+  chars.forEach(c => {
+    factionCounts[c.faction] = (factionCounts[c.faction] || 0) + 1;
+  });
+  const maxFaction = Math.max(...Object.values(factionCounts), 1);
+
+  let html = `
+    <div class="stat-row"><span class="stat-label">📖 小说名称</span><span class="stat-value">${d.novelName || '未知'}</span></div>
+    <div class="stat-row"><span class="stat-label">👤 角色总数</span><span class="stat-value">${n}</span></div>
+    <div class="stat-row"><span class="stat-label">🔗 关系总数</span><span class="stat-value">${m}</span></div>
+    <div class="stat-row"><span class="stat-label">🏳️ 阵营数量</span><span class="stat-value">${factions.length}</span></div>
+    <div class="stat-row"><span class="stat-label">📅 事件数量</span><span class="stat-value">${events.length}</span></div>
+    <div class="stat-row"><span class="stat-label">📊 网络密度</span><span class="stat-value">${density}%</span></div>
+  `;
+
+  if (topChars.length > 0) {
+    html += '<div class="stat-section-title">🏆 关联最多的角色</div>';
+    topChars.forEach((item, i) => {
+      const rankClass = i === 0 ? '' : (i === 1 ? 'r2' : (i === 2 ? 'r3' : ''));
+      const f = factions.find(x => x.key === item.char.faction);
+      html += `<div class="stat-top-item">
+        <span class="rank ${rankClass}">${i + 1}</span>
+        <span class="legend-dot" style="background:${f ? f.color : '#666'};width:8px;height:8px"></span>
+        <span style="flex:1">${item.char.name}</span>
+        <span style="color:var(--accent);font-weight:600">${item.count}</span>
+        <span style="color:var(--text-dim);font-size:11px">条关系</span>
+      </div>`;
+    });
+  }
+
+  if (factions.length > 0) {
+    html += '<div class="stat-section-title">🏳️ 阵营分布</div>';
+    html += '<div class="bar-chart">';
+    factions.forEach(f => {
+      const count = factionCounts[f.key] || 0;
+      const pct = (count / maxFaction * 100).toFixed(0);
+      html += `<div class="bar-item">
+        <span class="bar-label">${f.name}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${f.color}"></div></div>
+        <span class="bar-count">${count}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  statsContent.innerHTML = html;
+}
+
+statsToggle.addEventListener('click', function() {
+  renderStats();
+  statsPanel.classList.toggle('show');
+});
+statsClose.addEventListener('click', () => statsPanel.classList.remove('show'));
+// Close on click outside
+statsPanel.addEventListener('click', function(e) {
+  if (e.target === statsPanel) this.classList.remove('show');
+});
+
+// Share
+const shareBtn = document.getElementById('share-btn');
+shareBtn.addEventListener('click', function() {
+  const name = currentData ? currentData.novelName : '';
+  if (!name) { showError('暂无图谱可分享'); return; }
+  const url = location.origin + location.pathname + '?q=' + encodeURIComponent(name);
+  navigator.clipboard.writeText(url).then(() => {
+    errorToast.textContent = '✅ 链接已复制，发送给朋友即可打开图谱';
+    errorToast.style.display = 'block';
+    setTimeout(() => { errorToast.style.display = 'none'; }, 3000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showError('✅ 链接已复制到剪贴板');
+  });
+});
+
 // ===================== EDIT MODE =====================
 function toggleEditMode() {
   editMode = !editMode;
   editToggle.classList.toggle('active', editMode);
   document.getElementById('graph-container').classList.toggle('edit-mode', editMode);
-  saveLayoutBtn.classList.toggle('show', editMode);
+  editToolbar.classList.toggle('show', editMode);
 
   if (editMode) {
-    // Disable physics so nodes stay where dragged
     network.setOptions({ physics: { enabled: false } });
     network.setOptions({ interaction: { dragNodes: true } });
   } else {
-    // Optionally re-enable physics
+    exitAddEdgeMode();
     network.setOptions({ physics: { enabled: true } });
     network.stabilize(100);
   }
@@ -1622,6 +2056,86 @@ function loadSavedLayout() {
 }
 
 editToggle.addEventListener('click', toggleEditMode);
+
+addRelBtn.addEventListener('click', function() {
+  if (addEdgeMode) {
+    exitAddEdgeMode();
+  } else {
+    enterAddEdgeMode();
+  }
+});
+
+function enterAddEdgeMode() {
+  addEdgeMode = true;
+  addEdgeSource = null;
+  addRelBtn.classList.add('active');
+  addRelBtn.textContent = '❌ 取消连线';
+  addRelIndicator.classList.remove('hidden');
+  addRelIndicator.innerHTML = '请点击<b>起点</b>角色';
+  network.setOptions({ interaction: { dragNodes: false } });
+}
+
+function exitAddEdgeMode() {
+  addEdgeMode = false;
+  addEdgeSource = null;
+  addRelBtn.classList.remove('active');
+  addRelBtn.textContent = '➕ 添加关系';
+  addRelIndicator.classList.add('hidden');
+  network.setOptions({ interaction: { dragNodes: true } });
+}
+
+function getCustomEdgesKey() {
+  return 'custom_edges_' + (currentData ? currentData.novelName || 'unknown' : 'unknown');
+}
+
+function saveCustomEdge(from, to, type, style) {
+  const key = getCustomEdgesKey();
+  let edges = [];
+  try { edges = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+  edges.push({ from, to, type, style: style || 'solid', _custom: true });
+  localStorage.setItem(key, JSON.stringify(edges));
+}
+
+function deleteCustomEdge(from, to) {
+  const key = getCustomEdgesKey();
+  try {
+    let edges = JSON.parse(localStorage.getItem(key) || '[]');
+    edges = edges.filter(e => !(e.from === from && e.to === to) && !(e.from === to && e.to === from));
+    localStorage.setItem(key, JSON.stringify(edges));
+  } catch {}
+}
+
+function loadCustomEdges() {
+  const key = getCustomEdgesKey();
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+}
+
+function addEdgeToGraph(from, to, type, style) {
+  const newEdge = {
+    from, to, label: type,
+    dashes: style === 'dashed' ? [8, 4] : (style === 'dotted' ? [3, 3] : false),
+    color: { color: style === 'dashed' ? '#555' : '#888', hover: '#f0c040' },
+    font: { color: '#666', size: 10, strokeWidth: 2, strokeColor: '#0f1119' },
+    width: style === 'solid' ? 1.5 : 1,
+    smooth: { type: 'continuous' },
+    arrows: { to: { enabled: style === 'dashed', scaleFactor: 0.5 } },
+  };
+  edges.add(newEdge);
+  // Also add to currentData.relations so search works
+  if (currentData) {
+    currentData.relations.push({ from, to, type, style: style || 'solid', _custom: true });
+    // Update adjacency and edgeByPair
+    if (!adj[from]) adj[from] = [];
+    if (!adj[to]) adj[to] = [];
+    adj[from].push(to);
+    adj[to].push(from);
+    edgeByPair[edgeKey(from, to)] = { from, to, type, style: style || 'solid', _custom: true };
+  }
+}
+
 saveLayoutBtn.addEventListener('click', saveLayout);
 
 // ===================== TTS =====================
@@ -1652,7 +2166,18 @@ function speakExplanation(text, btn) {
 }
 
 // ===================== INIT =====================
-loadNovelData(DEMO_DATA);
+// Pre-populate novel map with demo data
+novelDataMap[DEMO_DATA.novelName] = { data: DEMO_DATA };
+novelTabOrder.push(DEMO_DATA.novelName);
+
+// Check URL params for sharing
+const urlParams = new URLSearchParams(window.location.search);
+const shareNovel = urlParams.get('q');
+if (shareNovel && shareNovel.trim().length >= 2 && shareNovel.trim() !== DEMO_DATA.novelName) {
+  setTimeout(() => generateNovel(shareNovel.trim()), 300);
+} else {
+  loadNovelData(DEMO_DATA);
+}
 
 console.log('📚 小说人物关系图谱已就绪');
 console.log('  当前示例：《三国演义》');
