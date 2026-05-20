@@ -257,6 +257,38 @@ app.post('/api/explain-path', async (req, res) => {
   }
 });
 
+// ── 数据同步 API ──
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+app.post('/api/sync/save', (req, res) => {
+  const { code, profile, favorites, layouts, customEdges } = req.body;
+  if (!code || typeof code !== 'string' || code.length < 4) {
+    return res.status(400).json({ error: '请设置至少 4 位的同步码' });
+  }
+  const file = path.join(DATA_DIR, `${code.replace(/[^a-zA-Z0-9]/g, '_')}.json`);
+  const data = { profile, favorites, layouts, customEdges, updatedAt: new Date().toISOString() };
+  try {
+    fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+    res.json({ ok: true, message: '数据已同步到服务器' });
+  } catch (err) {
+    res.status(500).json({ error: '保存失败' });
+  }
+});
+
+app.post('/api/sync/load', (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ error: '缺少同步码' });
+  const file = path.join(DATA_DIR, `${code.replace(/[^a-zA-Z0-9]/g, '_')}.json`);
+  if (!fs.existsSync(file)) return res.json({ ok: false, message: '未找到数据' });
+  try {
+    const data = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    res.json({ ok: true, ...data });
+  } catch (err) {
+    res.status(500).json({ error: '读取失败' });
+  }
+});
+
 // ── 启动服务器 ──
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
